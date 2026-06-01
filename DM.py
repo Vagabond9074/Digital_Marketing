@@ -1,19 +1,65 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
-st.write("Streamlit supports a wide range of data visualizations, including [Plotly, Altair, and Bokeh charts](https://docs.streamlit.io/develop/api-reference/charts). 📊 And with over 20 input widgets, you can easily make your data interactive!")
+st.set_page_config(page_title="Clients & Calls Dashboard", layout="wide")
 
-all_users = ["Alice", "Bob", "Charly"]
-with st.container(border=True):
-    users = st.multiselect("Users", all_users, default=all_users)
-    rolling_average = st.toggle("Rolling average")
+st.title("Clients and Call Lists Dashboard")
 
-np.random.seed(42)
-data = pd.DataFrame(np.random.randn(20, len(users)), columns=users)
-if rolling_average:
-    data = data.rolling(7).mean().dropna()
+# Load data
+@st.cache_data
+def load_data():
+    df_clients = pd.read_csv("clients.csv")
+    df_calls = pd.read_csv("call_lists.csv")
+    return df_clients, df_calls
 
-tab1, tab2 = st.tabs(["Chart", "Dataframe"])
-tab1.line_chart(data, height=250)
-tab2.dataframe(data, height=250, use_container_width=True)
+df_clients, df_calls = load_data()
+
+st.header("Clients Data")
+
+st.subheader("Dataset Preview")
+st.dataframe(df_clients, use_container_width=True)
+
+st.subheader("Clients Dataset Information")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Rows", df_clients.shape[0])
+
+with col2:
+    st.metric("Columns", df_clients.shape[1])
+
+with col3:
+    st.metric("Missing Values", df_clients.isna().sum().sum())
+
+st.subheader("Clients Columns")
+st.write(df_clients.dtypes)
+
+st.subheader("First Client Row")
+st.write(df_clients.loc[0])
+
+st.divider()
+
+st.header("Call Lists Data")
+
+st.subheader("Dataset Preview")
+st.dataframe(df_calls, use_container_width=True)
+
+st.subheader("Calls Dataset Information")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Rows", df_calls.shape[0])
+
+with col2:
+    st.metric("Columns", df_calls.shape[1])
+
+with col3:
+    st.metric("Missing Values", df_calls.isna().sum().sum())
+
+st.subheader("Calls Columns")
+st.write(df_calls.dtypes)
+
+st.subheader("First Call Row")
+st.write(df_calls.loc[0])
